@@ -1,0 +1,99 @@
+<script src="tinytest.js"></script>
+
+<script>
+(function(){
+  var libraryStorage = {};
+  function librarySystem(libraryName, dependencies, callback){
+      //  store mode
+      if(arguments.length === 3){
+          libraryStorage[libraryName] = {
+              dependencies: dependencies,
+              callback: callback,
+              cachedResult: null
+          }
+
+      //load mode
+    } else if(arguments.length === 1){
+          return libraryLoader(libraryName)
+      } else {
+        throw new TypeError('Invalid arguments. You need to pass in 3 arguments to store a library or 1 to call it.')
+      }
+    }
+
+    //function helper
+    function libraryLoader(libraryName) {
+        var library = libraryStorage[libraryName];
+        var callback = libraryStorage[libraryName].callback;
+        var dependencies = libraryStorage[libraryName].dependencies;
+        var dependenciesGathered;
+
+        if(library.cachedResult === null){
+          if (dependencies.length > 0 ){
+            dependenciesGathered = dependencies.map(function(dep){
+             return librarySystem(dep);
+           })
+          }
+
+         library.cachedResult = callback.apply(null, dependenciesGathered);
+        }
+        return library.cachedResult;
+  }
+  window.librarySystem = librarySystem;
+})()
+
+tests({
+
+  'If there is no dependency on the library, simply return the result of the callback': function () {
+    librarySystem('name', [], function() {
+      return 'Gordon';
+    });
+    librarySystem('name');
+
+    eq(librarySystem('name'), 'Gordon');
+  },
+  'If one library has dependencies, make sure they are loaded ': function () {
+    librarySystem('name', [], function() {
+      return 'Gordon';
+    });
+    librarySystem('company', [], function() {
+      return 'Watch and Code';
+    });
+    librarySystem('workBlurb', ['name', 'company'], function(name, company) {
+      return name + ' works at ' + company;
+    });
+    librarySystem('workBlurb');
+
+    eq(librarySystem('workBlurb'), 'Gordon works at Watch and Code');
+  },
+  'If the dependencies are out of order, load them as well': function () {
+    librarySystem('workBlurb', ['name', 'company'], function(name, company) {
+      return name + ' works at ' + company;
+    });
+    librarySystem('name', [], function() {
+      return 'Gordon';
+    });
+    librarySystem('company', [], function() {
+      return 'Watch and Code';
+    });
+    librarySystem('workBlurb');
+
+    eq(librarySystem('workBlurb'), 'Gordon works at Watch and Code');
+  },
+  'Ensure the callback is ran only once': function () {
+    var nrOfTimesCallbackHasRun = 0;
+    librarySystem('name', [], function() {
+       nrOfTimesCallbackHasRun++ ;
+       return 'Gordon';
+    });
+    librarySystem('workBlurb2', ['name'], function(){
+        return name  + ' works on a new video.'
+    });
+    librarySystem('name');
+    librarySystem('name');
+    librarySystem('workBlurb2');
+
+    eq(nrOfTimesCallbackHasRun, 1)
+  }
+});
+
+</script>

@@ -1,10 +1,3 @@
-//Done: Get successes to be green
-//Done: Make sure only one error per failure goes to the console
-//Done: Make failures red
-//Done: Show stack traces for failures
-//Done: Only show stack traces if you click expand
-
-//Done: Output summary statistics to the DOM
 
 var TinyTestHelper = {
      renderStats : function(tests, failures) {

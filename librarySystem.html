@@ -79,7 +79,7 @@ tests({
 
     eq(librarySystem('workBlurb'), 'Gordon works at Watch and Code');
   },
-  'Ensure the callback is ran only once': function () {
+  'Ensure the callback is ran only once for each library': function () {
     var nrOfTimesCallbackHasRun = 0;
     librarySystem('name', [], function() {
        nrOfTimesCallbackHasRun++ ;

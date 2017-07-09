@@ -43,13 +43,14 @@
 })()
 
 tests({
+
   'If there is no dependency on the library, simply return the result of the callback.': function () {
     librarySystem('name', [], function() {
       return 'Gordon';
     });
-
     eq(librarySystem('name'), 'Gordon');
   },
+
   'If one library has dependencies, make sure they are loaded.': function () {
     librarySystem('name', [], function() {
       return 'Gordon';
@@ -62,6 +63,7 @@ tests({
     });
     eq(librarySystem('workBlurb'), 'Gordon works at Watch and Code');
   },
+
   'If the dependencies are out of order, load them as well.': function () {
     librarySystem('workBlurb', ['name', 'company'], function(name, company) {
       return name + ' works at ' + company;
@@ -74,6 +76,7 @@ tests({
     });
     eq(librarySystem('workBlurb'), 'Gordon works at Watch and Code');
   },
+
   'Ensure the callback is ran only once for each library.': function () {
     var numberOfTimesCallbackHasRun = 0;
     librarySystem('name', [], function() {
@@ -87,6 +90,7 @@ tests({
     librarySystem('workBlurb2');
     eq(numberOfTimesCallbackHasRun, 1)
   },
+
   'Throw a Type Error if there are not 1 or 3 number of arguments.': function () {
     var isTypeError = false;
     try {
